@@ -3,7 +3,7 @@ import tempfile
 import os
 
 # 创建一个文件上传器
-uploaded_file = st.file_uploader("选择一个文件", type=["csv", "txt"])
+uploaded_file = st.file_uploader("选择一个文件", type=["xlsx", "xls"])
 
 if uploaded_file is not None:
     # 将上传的文件内容写入到一个临时文件中
