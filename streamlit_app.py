@@ -1,4 +1,5 @@
 import io
+import zipfile
 import streamlit as st
 import pandas as pd
 import qrcode
@@ -36,13 +37,18 @@ if uploaded_file is not None:
         img_byte_arr = img_byte_arr.getvalue()
 
         # 添加到列表
-        qr_images.append(img_byte_arr)
+        qr_images.append((f'qr_code_{index + 1}.png', img_byte_arr))
 
-    # 为每张图片创建下载按钮
-    for i, img_bytes in enumerate(qr_images):
-        st.download_button(
-            label=f"下载二维码图片 {i + 1}",
-            data=img_bytes,
-            file_name=f"qr_code_{i + 1}.png",
-            mime="image/png"
-        )
+    # 创建一个 zip 文件，包含所有二维码图片
+    zip_buffer = io.BytesIO()
+    with zipfile.ZipFile(zip_buffer, 'w') as zip_file:
+        for name, img_bytes in qr_images:
+            zip_file.writestr(name, img_bytes)
+
+    # 提供下载链接
+    st.download_button(
+        label="下载全部二维码图片",
+        data=zip_buffer.getvalue(),
+        file_name="all_qr_codes.zip",
+        mime="application/zip"
+    )
