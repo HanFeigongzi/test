@@ -1,23 +1,52 @@
 import streamlit as st
+import pandas as pd
+import qrcode
+from PIL import Image
 import tempfile
 import os
+from pathlib import Path
 
 # 创建一个文件上传器
-uploaded_file = st.file_uploader("选择一个文件", type=["xlsx", "xls"])
+uploaded_file = st.file_uploader("选择一个Excel文件", type=["xlsx", "xls"])
 
 if uploaded_file is not None:
-    # 将上传的文件内容写入到一个临时文件中
-    with tempfile.NamedTemporaryFile(delete=False) as tmp:
+    # 获取上传文件的文件名
+    file_name = uploaded_file.name
+    # 创建一个临时文件来处理上传的文件内容
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as tmp:
         tmp.write(uploaded_file.read())
         temp_file_path = tmp.name
     
-    # 显示临时文件的路径
-    st.text(f"文件已保存到临时位置: {temp_file_path}")
+    # 使用 pandas 读取 Excel 文件
+    df = pd.read_excel(temp_file_path)
 
-    # 现在你可以使用 'temp_file_path' 像处理普通文件一样处理这个临时文件
-    # 例如，你可以使用 open() 函数打开它
-    # with open(temp_file_path, 'r') as f:
-    #     data = f.read()
+    # 确定保存二维码图片的目标目录
+    target_dir = Path(temp_file_path).parent / Path(file_name).stem
+    if not os.path.exists(target_dir):
+        os.makedirs(target_dir)
+
+    # 遍历 A 列数据，为每一项生成二维码并保存到目标目录
+    for index, row in df.iterrows():
+        cell_value = str(row['A'])  # 假设 A 列的数据在列索引 'A'
+        
+        # 生成二维码
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
+        qr.add_data(cell_value)
+        qr.make(fit=True)
+
+        img = qr.make_image(fill_color="black", back_color="white")
+        
+        # 保存二维码图片到目标目录
+        img_path = os.path.join(target_dir, f'qr_{index}.png')
+        img.save(img_path)
     
-    # 不要忘记清理临时文件
+    # 清理临时文件
     os.remove(temp_file_path)
+
+    # 提示用户二维码已保存的位置
+    st.success(f'二维码图片已保存至：{target_dir}')
