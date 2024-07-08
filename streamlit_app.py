@@ -6,7 +6,7 @@ import qrcode
 from PIL import Image
 
 # 创建一个文件上传器
-uploaded_file = st.file_uploader("选择一个Excel文件", type=["xlsx", "xls"])
+uploaded_file = st.file_uploader("选择一个Excel文件 从A2单元格起填入需要生成二维码的值", type=["xlsx", "xls"])
 
 if uploaded_file is not None:
     # 使用 pandas 读取 Excel 文件
@@ -17,7 +17,7 @@ if uploaded_file is not None:
 
     # 遍历 A 列数据，为每一项生成二维码
     for index, row in df.iterrows():
-        cell_value = str(row[0])  # 假设 A 列的数据在列索引 'A'
+        cell_value = str(row[0])
 
         # 生成二维码
         qr = qrcode.QRCode(
