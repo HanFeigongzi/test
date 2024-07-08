@@ -11,7 +11,10 @@ if uploaded_file is not None:
     # 使用 pandas 读取 Excel 文件
     df = pd.read_excel(uploaded_file)
 
-    # 遍历 A 列数据，为每一项生成二维码并显示
+    # 创建一个空列表来存储二维码图片的字节流
+    qr_images = []
+
+    # 遍历 A 列数据，为每一项生成二维码
     for index, row in df.iterrows():
         cell_value = str(row['A'])  # 假设 A 列的数据在列索引 'A'
 
@@ -32,5 +35,14 @@ if uploaded_file is not None:
         img.save(img_byte_arr, format='PNG')
         img_byte_arr = img_byte_arr.getvalue()
 
-        # 显示二维码图片
-        st.image(img_byte_arr, caption=f"QR Code for {cell_value}", use_column_width=True)
+        # 添加到列表
+        qr_images.append(img_byte_arr)
+
+    # 为每张图片创建下载按钮
+    for i, img_bytes in enumerate(qr_images):
+        st.download_button(
+            label=f"下载二维码图片 {i + 1}",
+            data=img_bytes,
+            file_name=f"qr_code_{i + 1}.png",
+            mime="image/png"
+        )
