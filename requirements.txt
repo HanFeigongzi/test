@@ -1,4 +1,3 @@
 streamlit-nightly
 pandas
 qrcode
-PIL
