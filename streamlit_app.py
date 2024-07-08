@@ -20,8 +20,8 @@ if uploaded_file is not None:
     # 使用 pandas 读取 Excel 文件
     df = pd.read_excel(temp_file_path)
 
-    # 确定保存二维码图片的目标目录
-    target_dir = Path(temp_file_path).parent / Path(file_name).stem
+    # 指定D盘作为保存二维码图片的目标目录
+    target_dir = Path('D:/') / Path(file_name).stem
     if not os.path.exists(target_dir):
         os.makedirs(target_dir)
 
@@ -41,7 +41,7 @@ if uploaded_file is not None:
 
         img = qr.make_image(fill_color="black", back_color="white")
         
-        # 保存二维码图片到目标目录
+        # 保存二维码图片到D盘的目标目录
         img_path = os.path.join(target_dir, f'qr_{index}.png')
         img.save(img_path)
     
