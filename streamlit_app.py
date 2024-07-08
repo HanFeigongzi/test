@@ -4,12 +4,15 @@ import qrcode
 from PIL import Image
 import tempfile
 import os
+from pathlib import Path
 
 # 创建一个文件上传器
 uploaded_file = st.file_uploader("选择一个Excel文件", type=["xlsx", "xls"])
 
 if uploaded_file is not None:
-    # 将上传的文件内容写入到一个临时文件中
+    # 获取上传文件的文件名
+    file_name = uploaded_file.name
+    # 创建一个临时文件来处理上传的文件内容
     with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as tmp:
         tmp.write(uploaded_file.read())
         temp_file_path = tmp.name
@@ -17,7 +20,12 @@ if uploaded_file is not None:
     # 使用 pandas 读取 Excel 文件
     df = pd.read_excel(temp_file_path)
 
-    # 遍历 A 列数据，为每一项生成二维码
+    # 确定保存二维码图片的目标目录
+    target_dir = Path(temp_file_path).parent / Path(file_name).stem
+    if not os.path.exists(target_dir):
+        os.makedirs(target_dir)
+
+    # 遍历 A 列数据，为每一项生成二维码并保存到目标目录
     for index, row in df.iterrows():
         cell_value = str(row['A'])  # 假设 A 列的数据在列索引 'A'
         
@@ -33,8 +41,12 @@ if uploaded_file is not None:
 
         img = qr.make_image(fill_color="black", back_color="white")
         
-        # 在 Streamlit 中显示二维码图片
-        st.image(img)
+        # 保存二维码图片到目标目录
+        img_path = os.path.join(target_dir, f'qr_{index}.png')
+        img.save(img_path)
     
     # 清理临时文件
     os.remove(temp_file_path)
+
+    # 提示用户二维码已保存的位置
+    st.success(f'二维码图片已保存至：{target_dir}')
