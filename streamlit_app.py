@@ -5,6 +5,7 @@ from PIL import Image
 import tempfile
 import os
 from pathlib import Path
+import time
 
 # 创建一个文件上传器
 uploaded_file = st.file_uploader("选择一个Excel文件", type=["xlsx", "xls"])
@@ -44,6 +45,8 @@ if uploaded_file is not None:
         # 保存二维码图片到D盘的目标目录
         img_path = os.path.join(target_dir, f'qr_{index}.png')
         img.save(img_path)
+        time.sleep(1)
+        
     
     # 清理临时文件
     os.remove(temp_file_path)
