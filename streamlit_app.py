@@ -17,7 +17,7 @@ if uploaded_file is not None:
 
     # 遍历 A 列数据，为每一项生成二维码
     for index, row in df.iterrows():
-        cell_value = str(row['A'])  # 假设 A 列的数据在列索引 'A'
+        cell_value = str(row[0])  # 假设 A 列的数据在列索引 'A'
 
         # 生成二维码
         qr = qrcode.QRCode(
@@ -37,7 +37,7 @@ if uploaded_file is not None:
         img_byte_arr = img_byte_arr.getvalue()
 
         # 添加到列表
-        qr_images.append((f'qr_code_{index + 1}.png', img_byte_arr))
+        qr_images.append((f'{cell_value}.png', img_byte_arr))
 
     # 创建一个 zip 文件，包含所有二维码图片
     zip_buffer = io.BytesIO()
